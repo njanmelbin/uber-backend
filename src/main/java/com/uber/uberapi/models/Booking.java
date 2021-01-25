@@ -8,20 +8,18 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Getter
 @Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="booking")
-
-public class Booking extends Auditable{
+@Table(name = "booking")
+public class Booking extends Auditable {
+    @ManyToOne
+    private Passenger passenger;
 
     @ManyToOne
     private Driver driver;
-
-    @ManyToOne
-    private Passenger passenger;
 
     @Enumerated(value = EnumType.STRING)
     private BookingType bookingType;
@@ -31,7 +29,6 @@ public class Booking extends Auditable{
 
     @OneToOne
     private Review reviewByUser;
-
     @OneToOne
     private Review reviewByDriver;
 
@@ -39,7 +36,7 @@ public class Booking extends Auditable{
     private PaymentReceipt paymentReceipt;
 
     @OneToMany
-    private List<ExactLocation> route  = new ArrayList<>();
+    private List<ExactLocation> route = new ArrayList<>();
 
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date startTime;
@@ -47,7 +44,7 @@ public class Booking extends Auditable{
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date endTime;
 
-    private Long totatDistanceMeters;
+    private Long totalDistanceMeters;
 
     @OneToOne
     private OTP rideStartOTP;

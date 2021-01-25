@@ -3,51 +3,44 @@ package com.uber.uberapi.models;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Getter
 @Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="driver" , indexes = {
-        @Index( columnList = "account_id" , unique = true),
-        @Index( columnList = "car_id" , unique = true),
-})
-
-public class Driver extends Auditable{
-
-    private String picUrl;// image location - Amazon S3
-
+@Table(name = "driver")
+public class Driver extends Auditable {
     @OneToOne
-    private Account user;
+    private Account account;
+
+    private Gender gender;
 
     private String name;
-    private Gender gender;
 
     @OneToOne(mappedBy = "driver")
     private Car car;
 
     private String licenseDetails;
 
-    @Temporal(value= TemporalType.DATE)
+    @Temporal(value = TemporalType.DATE)
     private Date dob;
 
     @Enumerated(value = EnumType.STRING)
-    private DriverApprovalStatus status;
+    private DriverApprovalStatus approvalStatus;
 
-    @OneToMany(mappedBy="driver")
-    private List<Booking> bookings = new ArrayList<>();
+    @OneToMany(mappedBy = "driver")
+    private List<Booking> bookings;
 
     private Boolean isAvailable;
 
     private String activeCity;
 
     @OneToOne
-    private ExactLocation lastKnownExactLocation;
+    private ExactLocation lastKnownLocation;
 
     @OneToOne
     private ExactLocation home;

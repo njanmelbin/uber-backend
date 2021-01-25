@@ -8,37 +8,33 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Getter
 @Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="passenger")
-public class Passenger extends Auditable{
-    // database to provide the id for us
-    // autoincrement
+@Table(name = "passenger")
+public class Passenger extends Auditable {
     @OneToOne(cascade = CascadeType.ALL)
-    private Account user;
+    private Account account;
 
     private String name;
 
-    @Enumerated(value=EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)
     private Gender gender;
 
     @OneToMany(mappedBy = "passenger")
     private List<Booking> bookings = new ArrayList<>();
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(value = TemporalType.DATE)
     private Date dob;
 
     private String phoneNumber;
 
     @OneToOne
     private ExactLocation home;
-
     @OneToOne
     private ExactLocation work;
-
     @OneToOne
-    private ExactLocation lastKnownExactLocation;
+    private ExactLocation lastKnownLocation;
 }

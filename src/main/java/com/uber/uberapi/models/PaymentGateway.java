@@ -6,12 +6,12 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Getter
 @Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="paymentgateway")
-public class PaymentGateway extends Auditable{
+@Table(name = "paymentgateway")
+public class PaymentGateway extends Auditable {
     private String name;
 }

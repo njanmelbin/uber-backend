@@ -6,16 +6,13 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Getter
 @Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="otp")
-public class OTP extends Auditable{
-    private String value;
-    private String sendToNUmber;
-
+@Table(name = "otp")
+public class OTP extends Auditable {
+    private String code;
+    private String sentToNumber;
 }
-
-// by
