@@ -1,11 +1,16 @@
 package com.uber.uberapi.models;
 
+import com.uber.uberapi.exceptions.InvalidActionForBookingStateException;
+import com.uber.uberapi.exceptions.InvalidOTPException;
 import lombok.*;
 
 import javax.persistence.*;
+import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.uber.uberapi.models.Constants.RIDE_START_OTP_EXPIRY_MINUTES;
 
 @Entity
 @Setter
@@ -13,7 +18,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "booking")
+@Table(name = "booking" ,indexes ={
+        @Index(columnList = "passenger_id"),
+        @Index(columnList = "driver_id"),
+})
 public class Booking extends Auditable {
     @ManyToOne
     private Passenger passenger;
@@ -28,7 +36,7 @@ public class Booking extends Auditable {
     private BookingStatus bookingStatus;
 
     @OneToOne
-    private Review reviewByUser;
+    private Review reviewByPassenger;
     @OneToOne
     private Review reviewByDriver;
 
@@ -48,4 +56,22 @@ public class Booking extends Auditable {
 
     @OneToOne
     private OTP rideStartOTP;
+
+    public void startRide(OTP otp){
+        if(bookingStatus.equals(BookingStatus.CAB_ARRIVED)){
+            throw new InvalidActionForBookingStateException("Cannot start the ride before the driver has reached the pickup point");
+        }
+
+        if(!rideStartOTP.validateEnteredOTP(otp,RIDE_START_OTP_EXPIRY_MINUTES)){
+            throw new InvalidOTPException();
+        }
+        bookingStatus = BookingStatus.IN_RIDE;
+    }
+
+    public void endRide(){
+        if(!bookingStatus.equals(BookingStatus.IN_RIDE)){
+            throw new InvalidActionForBookingStateException("Ride hasnt started yet");
+        }
+        bookingStatus = BookingStatus.COMPLETED;
+    }
 }
