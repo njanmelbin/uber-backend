@@ -3,6 +3,7 @@ package com.uber.uberapi.models;
 import com.uber.uberapi.exceptions.InvalidActionForBookingStateException;
 import com.uber.uberapi.exceptions.InvalidOTPException;
 import lombok.*;
+import org.springframework.core.annotation.Order;
 
 import javax.persistence.*;
 import java.awt.print.Book;
@@ -44,6 +45,15 @@ public class Booking extends Auditable {
     private PaymentReceipt paymentReceipt;
 
     @OneToMany
+    @JoinTable(
+            name="booking_route",
+            joinColumns = @JoinColumn(name="booking_id"),
+            inverseJoinColumns = @JoinColumn(name="exact_location_id"),
+            indexes = {@Index(
+                    columnList = "booking_id"
+            )}
+    )
+    @OrderColumn(name="location_index")
     private List<ExactLocation> route = new ArrayList<>();
 
     @Temporal(value = TemporalType.TIMESTAMP)

@@ -3,6 +3,8 @@ package com.uber.uberapi.services;
 import com.uber.uberapi.models.Booking;
 import com.uber.uberapi.models.Driver;
 import com.uber.uberapi.models.Passenger;
+import org.springframework.stereotype.Service;
+
 
 public interface BookingService {
     void createBooking(Booking booking);

@@ -2,7 +2,9 @@ package com.uber.uberapi.services;
 
 import com.uber.uberapi.models.Booking;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class SchedulingServiceImpl implements SchedulingService{
 
     @Autowired

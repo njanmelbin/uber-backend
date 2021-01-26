@@ -2,9 +2,11 @@ package com.uber.uberapi.services;
 
 import com.uber.uberapi.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+@Service
 public class DefaultBookingService implements BookingService{
 
     @Autowired

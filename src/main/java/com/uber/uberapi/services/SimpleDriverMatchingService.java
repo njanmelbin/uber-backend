@@ -3,7 +3,9 @@ package com.uber.uberapi.services;
 import com.uber.uberapi.models.Booking;
 import com.uber.uberapi.models.Driver;
 import com.uber.uberapi.models.Passenger;
+import org.springframework.stereotype.Service;
 
+@Service
 public class SimpleDriverMatchingService implements DriverMatchingService {
     @Override
     public void acceptBooking(Driver driver, Booking booking) {
