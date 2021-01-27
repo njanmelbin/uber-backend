@@ -4,32 +4,25 @@ import lombok.*;
 
 import javax.persistence.*;
 
+
 @Entity
-@Getter
 @Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="car" , indexes = {
-        @Index(columnList = "driver_id" , unique = true)
-})
-
+@Table(name = "car")
 public class Car extends Auditable {
-
     @ManyToOne
     private Color color;
 
     private String plateNumber;
 
-    private String brand;
-
-    private String model;
+    private String brandAndModel;
 
     @Enumerated(value = EnumType.STRING)
     private CarType carType;
 
     @OneToOne
     private Driver driver;
-
-
 }

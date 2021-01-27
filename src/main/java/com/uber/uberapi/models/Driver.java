@@ -1,54 +1,71 @@
 package com.uber.uberapi.models;
 
+import com.uber.uberapi.exceptions.UnapprovedDriverException;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
-@Getter
 @Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="driver" , indexes = {
-        @Index( columnList = "account_id" , unique = true),
-        @Index( columnList = "car_id" , unique = true),
-})
-
-public class Driver extends Auditable{
-
-    private String picUrl;// image location - Amazon S3
-
+@Table(name = "driver")
+public class Driver extends Auditable {
     @OneToOne
-    private Account user;
+    private Account account;
+
+    private Gender gender;
 
     private String name;
-    private Gender gender;
 
     @OneToOne(mappedBy = "driver")
     private Car car;
 
     private String licenseDetails;
 
-    @Temporal(value= TemporalType.DATE)
+    @Temporal(value = TemporalType.DATE)
     private Date dob;
 
     @Enumerated(value = EnumType.STRING)
-    private DriverApprovalStatus status;
+    private DriverApprovalStatus approvalStatus;
 
-    @OneToMany(mappedBy="driver")
-    private List<Booking> bookings = new ArrayList<>();
+    @OneToMany(mappedBy = "driver")
+    private List<Booking> bookings;
+
+    @ManyToMany(mappedBy = "notifieddrivers",cascade=CascadeType.PERSIST)
+    private Set<Booking> acceptableBookings = new HashSet<>(); // bookings that driver can currently accept
+
+    @OneToOne
+    private Booking activeBooking=null;
 
     private Boolean isAvailable;
 
     private String activeCity;
 
+    private String phoneNumber;
+
     @OneToOne
-    private ExactLocation lastKnownExactLocation;
+    private ExactLocation lastKnownLocation;
 
     @OneToOne
     private ExactLocation home;
+
+    public void setAvailable(Boolean available) {
+        if(available && !approvalStatus.equals(DriverApprovalStatus.APPROVED)){
+            throw new UnapprovedDriverException("Driver approval pending or denied" + getId());
+        }
+        isAvailable = available;
+    }
+
+    public boolean canAcceptBooking(int maxWaitTimeForPreviousTime) {
+        if(isAvailable && activeBooking == null){
+            return true;
+        }
+        // check whether if teh current ride ends in 10 minutes i can accept
+        return activeBooking.getExpectedCompletionTime().before(DateUtils.addMinutes(new Date(),maxWaitTimeForPreviousTime) );
+    }
+
 }
