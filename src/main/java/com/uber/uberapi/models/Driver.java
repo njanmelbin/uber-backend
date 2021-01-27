@@ -4,8 +4,7 @@ import com.uber.uberapi.exceptions.UnapprovedDriverException;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Setter
@@ -36,9 +35,17 @@ public class Driver extends Auditable {
     @OneToMany(mappedBy = "driver")
     private List<Booking> bookings;
 
+    @ManyToMany(mappedBy = "notifieddrivers",cascade=CascadeType.PERSIST)
+    private Set<Booking> acceptableBookings = new HashSet<>(); // bookings that driver can currently accept
+
+    @OneToOne
+    private Booking activeBooking=null;
+
     private Boolean isAvailable;
 
     private String activeCity;
+
+    private String phoneNumber;
 
     @OneToOne
     private ExactLocation lastKnownLocation;
@@ -52,4 +59,13 @@ public class Driver extends Auditable {
         }
         isAvailable = available;
     }
+
+    public boolean canAcceptBooking(int maxWaitTimeForPreviousTime) {
+        if(isAvailable && activeBooking == null){
+            return true;
+        }
+        // check whether if teh current ride ends in 10 minutes i can accept
+        return activeBooking.getExpectedCompletionTime().before(DateUtils.addMinutes(new Date(),maxWaitTimeForPreviousTime) );
+    }
+
 }

@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ConstantsRepository extends JpaRepository<DBConstant,Long> {
+public interface DBConstantRepository extends JpaRepository<DBConstant,Long> {
 }

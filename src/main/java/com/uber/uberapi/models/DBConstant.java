@@ -2,6 +2,7 @@ package com.uber.uberapi.models;
 
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -11,13 +12,10 @@ import javax.persistence.Table;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="constant")
-public class Constant extends Auditable{
-
+@Table(name="dbconstant")
+public class DBConstant extends Auditable{
+    @Column(unique = true,nullable = false)
     String name;
     String value;
 
-    public Long getAsLong(){
-        return Long.parseLong(value);
-    }
 }
