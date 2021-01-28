@@ -11,7 +11,7 @@ import com.uber.uberapi.repositories.DriverRepository;
 import com.uber.uberapi.repositories.ReviewRepository;
 import com.uber.uberapi.services.BookingService;
 import com.uber.uberapi.services.Constants;
-import com.uber.uberapi.services.DriverMatchingService;
+import com.uber.uberapi.services.drivermatching.DriverMatchingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

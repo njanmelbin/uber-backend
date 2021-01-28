@@ -1,12 +1,15 @@
-package com.uber.uberapi.services;
+package com.uber.uberapi.services.drivermatching;
 
 import com.uber.uberapi.models.Booking;
 import com.uber.uberapi.models.Driver;
 import com.uber.uberapi.models.ExactLocation;
-import com.uber.uberapi.models.Passenger;
 import com.uber.uberapi.repositories.BookingRepository;
-import com.uber.uberapi.repositories.DriverRepository;
-import com.uber.uberapi.services.messagequeue.KafakeService;
+import com.uber.uberapi.services.Constants;
+import com.uber.uberapi.services.ETAService;
+import com.uber.uberapi.services.drivermatching.filters.DriverFilter;
+import com.uber.uberapi.services.drivermatching.filters.ETAFilter;
+import com.uber.uberapi.services.drivermatching.filters.GenderFilter;
+import com.uber.uberapi.services.locationtracking.LocationTrackingService;
 import com.uber.uberapi.services.messagequeue.MQMessage;
 import com.uber.uberapi.services.messagequeue.MessageQueue;
 import com.uber.uberapi.services.notification.NotificationService;
@@ -17,26 +20,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import javax.xml.stream.Location;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class DriverMatchingService  {
 
-    @Autowired
-    MessageQueue messageQueue;
+    final MessageQueue messageQueue;
 
-    @Autowired
-    Constants constants;
+    final Constants constants;
 
-    @Autowired
-    LocationTrackingService locationTrackingService;
+    final LocationTrackingService locationTrackingService;
 
-    @Autowired
-    NotificationService notificationService;
+    final NotificationService notificationService;
 
-    @Autowired
-    BookingRepository bookingRepository;
+    final BookingRepository bookingRepository;
+
+    final ETAService etaService;
+
+    final List<DriverFilter> driverFilters = new ArrayList<>();
+
+    public DriverMatchingService(MessageQueue messageQueue,
+                                 Constants constants,
+                                 LocationTrackingService locationTrackingService,
+                                 NotificationService notificationService,
+                                 BookingRepository bookingRepository,
+                                 ETAService etaService) {
+        this.messageQueue = messageQueue;
+        this.constants = constants;
+        this.locationTrackingService = locationTrackingService;
+        this.notificationService = notificationService;
+        this.bookingRepository = bookingRepository;
+        this.etaService = etaService;
+        driverFilters.add(new ETAFilter(this.etaService,constants));
+        driverFilters.add(new GenderFilter(constants));
+    }
 
     @Scheduled(fixedRate = 1000)
     public void consumer(){
@@ -70,6 +88,14 @@ public class DriverMatchingService  {
             driver.getAcceptableBookings().add(booking);
         });
         bookingRepository.save(booking);
+    }
+
+    public List<Driver> filterDrivers(List<Driver> drivers,Booking booking){
+        //Chain of responsiblity
+        for(DriverFilter filter:driverFilters){
+            drivers = filter.apply(drivers,booking);
+        }
+        return drivers;
     }
 
     @AllArgsConstructor

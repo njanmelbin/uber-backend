@@ -41,7 +41,7 @@ public class Constants {
     }
 
     public String getDriverMatchingTopicName() {
-        return constants.getOrDefault("driverMatchingTopicName","driverMatchingTopicName");
+        return constants.getOrDefault("driverMatchingTopicName","driverMatchingTopic");
     }
 
     public Integer getMaxWaitTimeForPreviousTime() {
@@ -50,6 +50,32 @@ public class Constants {
 
     public Integer getProcessBookingBeforeTime() {
         return Integer.parseInt(constants.getOrDefault("processBookingBeforeTime","900000"));
+
+    }
+
+    public String getLocationTrackingTopicName() {
+        return constants.getOrDefault("locationTrackingTopicName","locationTrackingTopic");
+    }
+
+    public  Double getMaxDistanceKmForDriverMatching() {
+        return Double.parseDouble(constants.getOrDefault("maxDistanceKmForDriverMatching","2"));
+
+    }
+
+    public int getMaxDriverETAMinutes() {
+        return Integer.parseInt(constants.getOrDefault("maxDriverETAMinutes","15"));
+    }
+
+    public boolean getIsETABasedFilterEnabled() {
+        return Boolean.parseBoolean(constants.getOrDefault("isETABasedFilterEnable","true"));
+    }
+
+    public boolean getIsGenderBasedFilterEnabled() {
+        return Boolean.parseBoolean(constants.getOrDefault("isETABasedFilterEnabled","true"));
+    }
+
+    public double getDefaultETASpeedKmph() {
+        return Double.parseDouble(constants.getOrDefault("getDefaultETASpeedKmph","30.0"));
 
     }
 }
