@@ -48,13 +48,17 @@ public class DriverController {
         return driver.get();
     }
 
-
-    public Booking getDriverBookingFromId(Long bookingId , Driver driver){
-        Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
-        if(optionalBooking.isEmpty()){
+    private Booking getBookingFromId(Long bookingId) {
+        Optional<Booking> booking = bookingRepository.findById(bookingId);
+        if(booking.isEmpty()){
             throw new InvalidDriverException("No booking with id" + bookingId);
         }
-        Booking booking =  optionalBooking.get();
+
+        return booking.get();
+    }
+
+    public Booking getDriverBookingFromId(Long bookingId , Driver driver){
+        Booking booking = getBookingFromId(bookingId);
         if(!booking.getDriver().equals(driver)){
             throw new InvalidBookingException("Driver with" + driver.getId() +" has no such booking");
         }
@@ -93,9 +97,11 @@ public class DriverController {
                               @PathVariable(name="bookingId")Long bookingId){
         Driver driver = getDriverFromId(driverId);
 
-        Booking booking = getDriverBookingFromId(bookingId,driver);
+        Booking booking = getBookingFromId(bookingId);
         bookingService.acceptBooking(driver,booking);
     }
+
+
 
     @DeleteMapping("/{driverId}/bookings/{bookingId}")
     public void cancelBooking(@PathVariable(name="driverId")Long driverId,
