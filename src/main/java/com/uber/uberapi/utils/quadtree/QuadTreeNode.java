@@ -77,16 +77,17 @@ public class QuadTreeNode {
     protected QuadTreeNode mBottomRightNode;
 
     /**
-     *  List of points of interest A.K.A neighbours inside this node
-     *  this list is only filled in the deepest nodes
+     * List of points of interest A.K.A neighbours inside this node
+     * this list is only filled in the deepest nodes
      */
     protected List<Neighbour> mNeighbours = new ArrayList<>();
 
     /**
      * Creates a new node
-     * @param latitude node's Y start point
-     * @param longitude node's X start point
-     * @param latitudeRange node's height
+     *
+     * @param latitude       node's Y start point
+     * @param longitude      node's X start point
+     * @param latitudeRange  node's height
      * @param longitudeRange node's width
      */
     public QuadTreeNode(double latitude, double longitude, double latitudeRange, double longitudeRange) {
@@ -96,6 +97,7 @@ public class QuadTreeNode {
     /**
      * Adds a neighbour in the quadtree.
      * This method will navigate and create nodes if necessary, until the smallest (deepest) node is reached
+     *
      * @param neighbour
      */
     public void addNeighbour(Neighbour neighbour, double deepestNodeSize) {
@@ -111,6 +113,7 @@ public class QuadTreeNode {
 
     /**
      * Removes a neighbour from the quadtree
+     *
      * @param id the neighbour's id
      * @return if the neighbour existed and was removed
      */
@@ -147,7 +150,8 @@ public class QuadTreeNode {
 
     /**
      * Recursively search for neighbours inside the given rectangle
-     * @param neighbourSet a set to be filled by this method
+     *
+     * @param neighbourSet     a set to be filled by this method
      * @param rangeAsRectangle the area of interest
      */
     public void findNeighboursWithinRectangle(Set<Neighbour> neighbourSet, Rectangle2D.Double rangeAsRectangle) {
@@ -221,8 +225,9 @@ public class QuadTreeNode {
 
     /**
      * Adds neighbours to the found set
-     * @param contains if the rangeAsRectangle is contained inside the node
-     * @param neighborSet a set to be filled by this method
+     *
+     * @param contains         if the rangeAsRectangle is contained inside the node
+     * @param neighborSet      a set to be filled by this method
      * @param rangeAsRectangle the area of interest
      */
     private void addNeighbors(boolean contains, Set<Neighbour> neighborSet, Rectangle2D.Double rangeAsRectangle) {
@@ -237,7 +242,8 @@ public class QuadTreeNode {
     /**
      * If the rangeAsRectangle is not contained inside this node we must
      * search for neighbours that are contained inside the rangeAsRectangle
-     * @param neighborSet a set to be filled by this method
+     *
+     * @param neighborSet      a set to be filled by this method
      * @param rangeAsRectangle the area of interest
      */
     private void findAll(Set<Neighbour> neighborSet, Rectangle2D.Double rangeAsRectangle) {
