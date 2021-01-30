@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 public class ConsoleNotificationService implements NotificationService {
     @Override
     public void notify(String phoneNumber, String message) {
-        System.out.printf("Notification to %s :%s",phoneNumber,message);
+        System.out.printf("Notification for %s: %s", phoneNumber, message);
     }
 }
+
+// doing dev on local machine
+// deploy to prod, you will use different notification

@@ -5,28 +5,24 @@ import com.uber.uberapi.models.Driver;
 import com.uber.uberapi.models.ExactLocation;
 import com.uber.uberapi.services.Constants;
 import com.uber.uberapi.services.ETAService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ETAFilter extends DriverFilter{
-
+public class ETABasedFilter extends DriverFilter {
     private final ETAService etaService;
 
-
-    public ETAFilter(ETAService etaService,Constants constants){
+    public ETABasedFilter(ETAService etaService, Constants constants) {
         super(constants);
-        this.etaService= etaService;
+        this.etaService = etaService;
     }
 
     public List<Driver> apply(List<Driver> drivers, Booking booking) {
-        if(!getConstants().getIsETABasedFilterEnabled()){
-            return drivers;
-        }
+        if (!getConstants().getIsETABasedFilterEnabled()) return drivers;
+
         ExactLocation pickup = booking.getPickupLocation();
         return drivers.stream().filter(driver -> {
-            return etaService.getETAInMinutes(driver.getLastKnownLocation(),pickup) <= getConstants().getMaxDriverETAMinutes();
+            return etaService.getETAMinutes(driver.getLastKnownLocation(), pickup) <= getConstants().getMaxDriverETAMinutes();
         }).collect(Collectors.toList());
     }
 }

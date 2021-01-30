@@ -11,144 +11,134 @@ import com.uber.uberapi.repositories.DriverRepository;
 import com.uber.uberapi.repositories.ReviewRepository;
 import com.uber.uberapi.services.BookingService;
 import com.uber.uberapi.services.Constants;
-import com.uber.uberapi.services.drivermatching.DriverMatchingService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@RestController
 @RequestMapping("/driver")
+@RestController
 public class DriverController {
+    // all endpoints that the driver can use
 
-    @Autowired
-    DriverRepository driverRepository;
+    final DriverRepository driverRepository;
+    final BookingRepository bookingRepository;
+    final BookingService bookingService;
+    final ReviewRepository reviewRepository;
+    final Constants constants;
 
-    @Autowired
-    BookingRepository bookingRepository;
+    public DriverController(DriverRepository driverRepository, BookingRepository bookingRepository, BookingService bookingService, ReviewRepository reviewRepository, Constants constants) {
+        this.driverRepository = driverRepository;
+        this.bookingRepository = bookingRepository;
+        this.bookingService = bookingService;
+        this.reviewRepository = reviewRepository;
+        this.constants = constants;
+    }
 
-    @Autowired
-    DriverMatchingService driverMatchingService;
-
-    @Autowired
-    BookingService bookingService;
-
-    @Autowired
-    ReviewRepository reviewRepository;
-
-    @Autowired
-    Constants constants;
-
-    public Driver getDriverFromId(Long driverId){
-        Optional<Driver> driver =  driverRepository.findById(driverId);
-        if(driver.isEmpty()){
-            throw new InvalidBookingException("No driver with id "+ driverId);
+    public Driver getDriverFromId(Long driverId) {
+        Optional<Driver> driver = driverRepository.findById(driverId);
+        if (driver.isEmpty()) {
+            throw new InvalidDriverException("No driver with id " + driverId);
         }
         return driver.get();
     }
 
     private Booking getBookingFromId(Long bookingId) {
         Optional<Booking> booking = bookingRepository.findById(bookingId);
-        if(booking.isEmpty()){
-            throw new InvalidDriverException("No booking with id" + bookingId);
+        if (booking.isEmpty()) {
+            throw new InvalidBookingException("No booking with id " + booking);
         }
-
         return booking.get();
     }
 
-    public Booking getDriverBookingFromId(Long bookingId , Driver driver){
+    public Booking getDriverBookingFromId(Long bookingId, Driver driver) {
         Booking booking = getBookingFromId(bookingId);
-        if(!booking.getDriver().equals(driver)){
-            throw new InvalidBookingException("Driver with" + driver.getId() +" has no such booking");
+        if (!booking.getDriver().equals(driver)) {
+            throw new InvalidBookingException("Driver " + driver.getBookings() + " has no such booking " + bookingId);
         }
         return booking;
     }
+
+
     @GetMapping("/{driverId}")
-    public Driver getDriverDetails(@PathVariable(name = "driverId") Long driverId){
-        Driver driver = getDriverFromId(driverId);
-        return driver;
+    public Driver getDriverDetails(@PathVariable(name = "driverId") Long driverId) {
+        return getDriverFromId(driverId);
     }
 
-    @PutMapping("/{driverId}")
-    public void changeAvailability(@PathVariable(name ="driverId")Long driverId,@RequestBody Boolean available){
+    @PatchMapping("/{driverId}")
+    public void changeAvailability(@PathVariable(name = "driverId") Long driverId,
+                                   @RequestBody Boolean available) {
         Driver driver = getDriverFromId(driverId);
         driver.setIsAvailable(available);
         driverRepository.save(driver);
     }
 
-    @GetMapping("/{driverId}/bookings")
-    public List<Booking> getAllBookings(@PathVariable(name ="driverId")Long driverId){
+    @GetMapping("{driverId}/bookings")
+    public List<Booking> getAllBookings(@PathVariable(name = "driverId") Long driverId) {
         Driver driver = getDriverFromId(driverId);
         return driver.getBookings();
     }
 
-    @GetMapping("/{driverId}/bookings/{bookingId}")
-    public Booking getBooking(@PathVariable(name ="driverId")Long driverId,
-                              @PathVariable(name ="bookingId")Long bookingId){
+    @GetMapping("{driverId}/bookings/{bookingId}")
+    public Booking getBooking(@PathVariable(name = "driverId") Long driverId,
+                              @PathVariable(name = "bookingId") Long bookingId) {
         Driver driver = getDriverFromId(driverId);
-
-        Booking booking = getDriverBookingFromId(bookingId,driver);
-        return booking;
+        // driver can only see bookings that they're the driver for
+        return getDriverBookingFromId(bookingId, driver);
     }
 
-    @PostMapping("/{driverId}/bookings/{bookingId}")
-    public void acceptBooking(@PathVariable(name="driverId")Long driverId,
-                              @PathVariable(name="bookingId")Long bookingId){
-        Driver driver = getDriverFromId(driverId);
+    // 500: Internal Server Error
+    // Driver is forbidden to see that booking
+    // Driver is trying to perform an incorrect action
 
+    @PostMapping("{driverId}/bookings/{bookingId}")
+    public void acceptBooking(@PathVariable(name = "driverId") Long driverId,
+                              @PathVariable(name = "bookingId") Long bookingId) {
+        Driver driver = getDriverFromId(driverId);
+        // driver can only see bookings that they're the driver for
         Booking booking = getBookingFromId(bookingId);
-        bookingService.acceptBooking(driver,booking);
+        bookingService.acceptBooking(driver, booking);
     }
 
-
-
-    @DeleteMapping("/{driverId}/bookings/{bookingId}")
-    public void cancelBooking(@PathVariable(name="driverId")Long driverId,
-                              @PathVariable(name="bookingId")Long bookingId){
+    @DeleteMapping("{driverId}/bookings/{bookingId}")
+    public void cancelBooking(@PathVariable(name = "driverId") Long driverId,
+                              @PathVariable(name = "bookingId") Long bookingId) {
         Driver driver = getDriverFromId(driverId);
-
-        Booking booking = getDriverBookingFromId(bookingId,driver);
-        bookingService.cancelByDriver(driver,booking);
-
+        Booking booking = getDriverBookingFromId(bookingId, driver);
+        bookingService.cancelByDriver(driver, booking);
     }
 
     // rate the booking
-    // start the rode
-    // stop the rideå
-    @PatchMapping("/{driverId}/bookings/{bookingId}/start")
-    public void startRide(@PathVariable(name="driverId")Long driverId,
-                              @PathVariable(name="bookingId")Long bookingId,
-                                @RequestBody OTP otp){
+    // start the ride
+    // end the ride
+
+    @PatchMapping("{driverId}/bookings/{bookingId}/start")
+    public void startRide(@PathVariable(name = "driverId") Long driverId,
+                          @PathVariable(name = "bookingId") Long bookingId,
+                          @RequestBody OTP otp) {
         Driver driver = getDriverFromId(driverId);
-
-        Booking booking = getDriverBookingFromId(bookingId,driver);
-
-        booking.startRide(otp,constants.getRideStartOTPExpiryMinutes());
+        Booking booking = getDriverBookingFromId(bookingId, driver);
+        booking.startRide(otp, constants.getRideStartOTPExpiryMinutes());
         bookingRepository.save(booking);
-
     }
 
-    @PatchMapping("/{driverId}/bookings/{bookingId}/end")
-    public void endRide(@PathVariable(name="driverId")Long driverId,
-                          @PathVariable(name="bookingId")Long bookingId ){
+    @PatchMapping("{driverId}/bookings/{bookingId}/end")
+    public void endRide(@PathVariable(name = "driverId") Long driverId,
+                        @PathVariable(name = "bookingId") Long bookingId) {
         Driver driver = getDriverFromId(driverId);
-
-        Booking booking = getDriverBookingFromId(bookingId,driver);
-
+        Booking booking = getDriverBookingFromId(bookingId, driver);
         booking.endRide();
         driverRepository.save(driver);
         bookingRepository.save(booking);
-
     }
 
-    @PatchMapping("/{driverId}/bookings/{bookingId}/rate")
-    public void rateRide(@PathVariable(name="driverId")Long driverId,
-                        @PathVariable(name="bookingId")Long bookingId ,
-                        @RequestBody Review data){
+    @PatchMapping("{driverId}/bookings/{bookingId}/rate")
+    public void rateRide(@PathVariable(name = "driverId") Long driverId,
+                         @PathVariable(name = "bookingId") Long bookingId,
+                         @RequestBody Review data) {
+        // gets json data in the body
         Driver driver = getDriverFromId(driverId);
-
-        Booking booking = getDriverBookingFromId(bookingId,driver);
+        Booking booking = getDriverBookingFromId(bookingId, driver);
         Review review = Review.builder()
                 .note(data.getNote())
                 .ratingOutOfFive(data.getRatingOutOfFive())
@@ -158,3 +148,9 @@ public class DriverController {
         bookingRepository.save(booking);
     }
 }
+
+
+// Controllers -> models / services
+// Services -> other services / other controllers / models
+// models(DAO) -> DB
+// repositories(DAL) -> manage the models

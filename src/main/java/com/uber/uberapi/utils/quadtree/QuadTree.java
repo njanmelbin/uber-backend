@@ -21,21 +21,21 @@ import java.util.Set;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * <p>
  * ============================================================================
- *
+ * <p>
  * This class is the wrapper between the "view" and the quadtree data structure.
- *
+ * <p>
  * Few notes/explanations:
- *
+ * <p>
  * The {@link Rectangle2D.Double} does not support negative bounds. Having this limitation
  * in mind we need to normalize the latitude and longitude.
- *
+ * <p>
  * But why TOTAL_X_DEGREES is 360 and TOTAL_Y_DEGREES is 180?
- *
+ * <p>
  * That's the 2d representation of the world in latitude/longitude degrees.
- * @see <a href="http://fortunedream.info/wp-content/uploads/2018/01/latitude-map-of-the-world-maps-lines-longitude-and-interactive-locator.jpg">Globe 2D Projection</a>
  *
+ * @see <a href="http://fortunedream.info/wp-content/uploads/2018/01/latitude-map-of-the-world-maps-lines-longitude-and-interactive-locator.jpg">Globe 2D Projection</a>
  */
 
 public class QuadTree {
@@ -77,7 +77,7 @@ public class QuadTree {
         Set<Neighbour> neighbourSet = findNeighbours(latitude, longitude, rangeInKm);
         Set<Long> neighboursIds = new HashSet<>();
 
-        for(Neighbour neighbour : neighbourSet)
+        for (Neighbour neighbour : neighbourSet)
             neighboursIds.add(neighbour.getId());
 
         return neighboursIds;

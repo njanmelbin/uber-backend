@@ -1,6 +1,5 @@
 package com.uber.uberapi.models;
 
-import com.uber.uberapi.exceptions.InvalidOTPException;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -19,17 +18,17 @@ public class OTP extends Auditable {
 
     public static OTP make(String phoneNumber) {
         return OTP.builder()
-                .code("0000") // plugin a random number generator
+                .code("0000") // random number generator
                 .sentToNumber(phoneNumber)
                 .build();
     }
 
-
-    public boolean validateEnteredOTP(OTP otp,Integer expirtyMinutes){
-        if(!code.equals(otp.getCode())){
+    public boolean validateEnteredOTP(OTP otp, Integer expiryMinutes) {
+        if (!code.equals(otp.getCode())) {
             return false;
         }
-        // if the createdAt+ expiry minutes > current time , then it is valid, otherwise not
+        // if the createAt + expiryMinutes > currentTime, then it is valid
+        // other not
         return true;
     }
 }

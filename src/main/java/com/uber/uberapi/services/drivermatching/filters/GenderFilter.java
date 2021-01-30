@@ -9,20 +9,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GenderFilter extends DriverFilter {
-
     public GenderFilter(Constants constants) {
         super(constants);
     }
 
     public List<Driver> apply(List<Driver> drivers, Booking booking) {
-        if(!getConstants().getIsGenderBasedFilterEnabled()){
-            return drivers;
-        }
-        //male drivers can only drive male passengers
+        // male drivers can only driver male passengers
         // for a female or non-binary passenger the driver must also be female/non-binary
+        if (!getConstants().getIsETABasedFilterEnabled()) return drivers;
 
         Gender passengerGender = booking.getPassenger().getGender();
-        return drivers.stream().filter(driver ->{
+        return drivers.stream().filter(driver -> {
             Gender driverGender = driver.getGender();
             return !driverGender.equals(Gender.MALE) || passengerGender.equals(Gender.MALE);
         }).collect(Collectors.toList());
